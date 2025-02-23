@@ -10,10 +10,10 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Debug: List all files in the workspace
-        run: ls -R  # This helps confirm pom.xml is in the root directory
+        run: ls -R  # This helps confirm pom.xml is in the correct directory
 
       - name: Verify POM File Exists
-        run: test -f pom.xml && echo "POM file exists" || echo "POM file is missing"
+        run: test -f pom.xml && echo "✅ POM file exists" || (echo "❌ POM file is missing" && exit 1)
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -23,4 +23,5 @@ jobs:
           cache: maven
 
       - name: Build with Maven
+        working-directory: ./loggers  # Change this if your pom.xml is inside another folder
         run: mvn -B package --file pom.xml
