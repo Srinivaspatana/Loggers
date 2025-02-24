@@ -29,13 +29,18 @@ jobs:
       - name: Log in to GitHub Container Registry (GHCR)
         env:
           GHCR_PAT: ${{ secrets.GHCR_PAT }}
-        run: echo "$GHCR_PAT" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+          GHCR_USERNAME: ${{ github.actor }}
+        run: echo "$GHCR_PAT" | docker login ghcr.io -u "$GHCR_USERNAME" --password-stdin
 
       - name: Build and Tag Docker Image
         run: |
           IMAGE_NAME=ghcr.io/${{ github.repository_owner }}/my-app:latest
+          IMAGE_NAME=$(echo "$IMAGE_NAME" | tr '[:upper:]' '[:lower:]')  # Convert to lowercase (GHCR requirement)
+          echo "Building Docker image: $IMAGE_NAME"
           docker build -t $IMAGE_NAME .
           echo "IMAGE_NAME=$IMAGE_NAME" >> $GITHUB_ENV
 
       - name: Push Docker Image to GHCR
-        run: docker push $IMAGE_NAME
+        run: |
+          echo "Pushing Docker image: $IMAGE_NAME"
+          docker push $IMAGE_NAME
